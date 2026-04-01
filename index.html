@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pet Home - 智能场景</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Quicksand', sans-serif; background-color: #FFFDF6; transition: background 0.5s ease; }
+        .clay-card { background: rgba(255, 255, 255, 0.8); border-radius: 32px; box-shadow: 10px 10px 20px #E5E2D7; backdrop-filter: blur(8px); }
+        .agent-btn { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .agent-btn:hover { transform: translateY(-10px); }
+        .page { transition: all 0.5s ease; display: none; }
+        .page.active { display: flex; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .recipe-card { background: #fff; border-radius: 20px; border: 2px dashed #FFD93D; }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col items-center">
+
+    <!-- 主页面 (Index) -->
+    <section id="page-home" class="page active h-full w-full flex-col items-center justify-between p-6">
+        <header class="w-full max-w-md mt-4">
+            <h1 class="text-3xl font-bold text-orange-400">WarmHome AI</h1>
+            <p class="text-gray-400">主人，今天想翻哪位小可爱的牌子？</p>
+        </header>
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="text-[120px] animate-bounce">🏠</div>
+        </div>
+
+        <!-- Agent 入口 Dock -->
+        <div class="w-full max-w-lg mb-8">
+            <div class="clay-card p-6 flex justify-around items-center">
+                <div onclick="showDetail('Buddy')" class="agent-btn flex flex-col items-center">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-3xl flex items-center justify-center text-3xl">🐶</div>
+                    <span class="mt-2 text-xs font-bold text-gray-500">安全管家</span>
+                </div>
+                <div onclick="showDetail('Mimi')" class="agent-btn flex flex-col items-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-3xl flex items-center justify-center text-3xl">🐱</div>
+                    <span class="mt-2 text-xs font-bold text-gray-500">氛围大师</span>
+                </div>
+                <div onclick="showDetail('Nutty')" class="agent-btn flex flex-col items-center">
+                    <div class="w-16 h-16 bg-orange-100 rounded-3xl flex items-center justify-center text-3xl">🐿️</div>
+                    <span class="mt-2 text-xs font-bold text-gray-500">松鼠厨神</span>
+                </div>
+                <div onclick="showDetail('Turbo')" class="agent-btn flex flex-col items-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-3xl flex items-center justify-center text-3xl">🐰</div>
+                    <span class="mt-2 text-xs font-bold text-gray-500">清洁能手</span>
+                </div>
+                <div onclick="showDetail('Ducky')" class="agent-btn flex flex-col items-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center text-3xl">🐤</div>
+                    <span class="mt-2 text-xs font-bold text-gray-500">治愈卫浴</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 详情页面 (Detail) -->
+    <section id="page-detail" class="page h-full w-full flex-col items-center p-6 relative overflow-y-auto">
+        <!-- 返回按钮 -->
+        <button onclick="showHome()" class="absolute top-8 left-8 text-2xl">🏠 Back</button>
+
+        <!-- 角色头部 -->
+        <div id="detail-header" class="text-center mt-12">
+            <div id="detail-emoji" class="text-[100px] mb-4"></div>
+            <h2 id="detail-title" class="text-3xl font-bold mb-2"></h2>
+            <p id="detail-quote" class="italic text-gray-500"></p>
+        </div>
+
+        <!-- 动态功能区 -->
+        <div id="detail-content" class="w-full max-w-md mt-8 space-y-4">
+            <!-- 这里由JS动态填充 -->
+        </div>
+    </section>
+
+    <script>
+        const agents = {
+            'Buddy': {
+                name: '管家汪 Buddy', emoji: '🐶', quote: '“家里我守着，你放心出门玩！”',
+                bgColor: '#FFF9E5',
+                controls: `
+                    <div class="clay-card p-4 flex justify-between items-center">
+                        <span>智能门锁</span>
+                        <button class="bg-green-400 text-white px-4 py-1 rounded-full">已锁门</button>
+                    </div>
+                    <div class="clay-card p-4 flex justify-between items-center">
+                        <span>客厅监控</span>
+                        <button class="bg-blue-400 text-white px-4 py-1 rounded-full">查看画面</button>
+                    </div>
+                `
+            },
+            'Mimi': {
+                name: '慵懒猫 Mimi', emoji: '🐱', quote: '“要把光线调成梦的颜色吗？”',
+                bgColor: '#F3E8FF',
+                controls: `
+                    <div class="clay-card p-4">
+                        <p class="mb-2">灯光亮度</p>
+                        <input type="range" class="w-full">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="clay-card p-4 bg-orange-100">🌙 睡眠模式</button>
+                        <button class="clay-card p-4 bg-blue-100">🎬 电影模式</button>
+                    </div>
+                `
+            },
+            'Nutty': {
+                name: '松鼠厨神 Nutty', emoji: '🐿️', quote: '“肚子饿了吗？我来露一手！”',
+                bgColor: '#FFEDD5',
+                controls: `
+                    <div class="recipe-card p-4">
+                        <p class="text-xs text-orange-500 font-bold mb-1">今日推荐菜谱 🐿️⭐</p>
+                        <h3 class="text-lg font-bold">无油香脆炸鸡翅</h3>
+                        <p class="text-sm text-gray-500 mb-4">无需解冻，直接放入空气炸锅...</p>
+                        <button onclick="alert('空气炸锅已启动！预计20分钟后出炉！')" class="w-full bg-orange-400 text-white py-3 rounded-2xl font-bold">一键开启空气炸锅</button>
+                    </div>
+                    <div class="clay-card p-4 flex justify-between items-center">
+                        <span>咖啡机</span>
+                        <button class="bg-brown-500 border border-amber-900 px-4 py-1 rounded-full">预热中</button>
+                    </div>
+                `
+            },
+            'Turbo': {
+                name: '元气兔 Turbo', emoji: '🐰', quote: '“嘿哈！灰尘全都逃不掉！”',
+                bgColor: '#DCFCE7',
+                controls: `
+                    <div class="clay-card p-4 text-center">
+                        <p class="text-sm">扫地机电量: 85%</p>
+                        <div class="w-full bg-gray-200 h-2 rounded-full mt-2">
+                            <div class="bg-green-500 h-2 rounded-full w-[85%]"></div>
+                        </div>
+                    </div>
+                    <button class="w-full clay-card p-6 text-xl font-bold bg-green-50">🚀 开始全屋清扫</button>
+                `
+            },
+            'Ducky': {
+                name: '治愈鸭 Ducky', emoji: '🐤', quote: '“嘎嘎！洗个热水澡吧~”',
+                bgColor: '#DBEAFE',
+                controls: `
+                    <div class="clay-card p-6 flex flex-col items-center">
+                        <span class="text-4xl mb-2">42°C</span>
+                        <span class="text-sm text-gray-500">当前水温</span>
+                    </div>
+                    <button class="w-full bg-blue-400 text-white py-3 rounded-2xl font-bold">开始放水</button>
+                `
+            }
+        };
+
+        function showDetail(id) {
+            const agent = agents[id];
+            document.getElementById('page-home').classList.remove('active');
+            document.getElementById('page-detail').classList.add('active');
+            
+            // 改变页面主题色
+            document.body.style.backgroundColor = agent.bgColor;
+            
+            // 填充内容
+            document.getElementById('detail-emoji').innerText = agent.emoji;
+            document.getElementById('detail-title').innerText = agent.name;
+            document.getElementById('detail-quote').innerText = agent.quote;
+            document.getElementById('detail-content').innerHTML = agent.controls;
+        }
+
+        function showHome() {
+            document.getElementById('page-detail').classList.remove('active');
+            document.getElementById('page-home').classList.add('active');
+            document.body.style.backgroundColor = '#FFFDF6';
+        }
+    </script>
+</body>
+</html>
